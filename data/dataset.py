@@ -1,60 +1,60 @@
-import os
-import json
-from collections import Counter
+from datasets import load_dataset
 from torch.utils.data import Dataset
+from typing import Dict, List
 from transformers import BertTokenizer
 
-class WMT14ENDeDataset(Dataset):
-    def __init__(self, data_dir, split='train', max_len=512, min_freq=2):
-        self.data_dir = data_dir
-        self.split = split
-        self.max_len = max_len
-        self.min_freq = min_freq
 
-        self.src_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        self.tgt_tokenizer = BertTokenizer.from_pretrained('bert-base-german-cased')
+class WMTDataset(Dataset):
+    def __init__(
+        self,
+        split: str = "train",
+        max_length: int = 512,
+        subset_fraction: float = 1.0,
+        vocab_size: int = 10000,
+    ):
+        self.dataset = load_dataset("wmt/wmt14", "de-en", split=split)
 
-        self.src_vocab, self.tgt_vocab = self.build_vocabulary()
-        self.samples = self.load_data()
+        if subset_fraction < 1.0:
+            self.dataset = self.dataset.select(
+                range(int(len(self.dataset) * subset_fraction))
+            )
 
-    def build_vocabulary(self):
-        src_tokens = []
-        tgt_tokens = []
+        self.max_length = max_length
 
-        for split in ['train', 'valid', 'test']:
-            data = json.load(open(os.path.join(self.data_dir, f'{split}.json'), 'r'))
-            for sample in data:
-                src_tokens.extend(self.src_tokenizer.tokenize(sample['src']))
-                tgt_tokens.extend(self.tgt_tokenizer.tokenize(sample['tgt']))
+        self.tokenizer = BertTokenizer.from_pretrained(
+            "bert-base-multilingual-cased",
+            model_max_length=max_length,
+            vocab_size=vocab_size,
+        )
 
-        src_vocab = self.create_vocabulary(src_tokens)
-        tgt_vocab = self.create_vocabulary(tgt_tokens)
+    def __len__(self) -> int:
+        return len(self.dataset)
 
-        return src_vocab, tgt_vocab
+    def __getitem__(self, idx: int) -> Dict[str, List[int]]:
+        item = self.dataset[idx]
+        source = item["translation"]["de"]
+        target = item["translation"]["en"]
 
-    def create_vocabulary(self, tokens):
-        token_counts = Counter(tokens)
-        vocab = {'<sos>': 0, '<eos>': 1, '<unk>': 2}
-        for token, count in token_counts.most_common():
-            if count >= self.min_freq:
-                vocab[token] = len(vocab)
-        return vocab
+        # tokenize and encode the source and target
+        source_encoding = self.tokenizer(
+            source,
+            max_length=self.max_length,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt",
+        )
 
-    def load_data(self):
-        data = json.load(open(os.path.join(self.data_dir, f'{self.split}.json'), 'r'))
-        return data
+        target_encoding = self.tokenizer(
+            target,
+            max_length=self.max_length,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt",
+        )
 
-    def __len__(self):
-        return len(self.samples)
-
-    def __getitem__(self, idx):
-        sample = self.samples[idx]
-        src_text, tgt_text = sample['src'], sample['tgt']
-
-        src_ids = [self.src_vocab['<sos>']] + [self.src_vocab.get(token, self.src_vocab['<unk>']) for token in self.src_tokenizer.tokenize(src_text)] + [self.src_vocab['<eos>']]
-        tgt_ids = [self.tgt_vocab['<sos>']] + [self.tgt_vocab.get(token, self.tgt_vocab['<unk>']) for token in self.tgt_tokenizer.tokenize(tgt_text)] + [self.tgt_vocab['<eos>']]
-
-        src_ids = src_ids[:self.max_len]
-        tgt_ids = tgt_ids[:self.max_len]
-
-        return torch.tensor(src_ids), torch.tensor(tgt_ids)
+        return {
+            "source_ids": source_encoding["input_ids"].squeeze(),
+            "source_mask": source_encoding["attention_mask"].squeeze(),
+            "target_ids": target_encoding["input_ids"].squeeze(),
+            "target_mask": target_encoding["attention_mask"].squeeze(),
+        }
