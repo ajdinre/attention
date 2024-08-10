@@ -9,8 +9,7 @@ from evaluate import evaluate_model
 from utils import get_device
 
 def main():
-    # device = torch.device(get_device())
-    device = torch.device('cpu')
+    device = torch.device(get_device())
     
     # hp
     batch_size = 64
