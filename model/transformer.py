@@ -7,19 +7,22 @@ from .attention import MultiHeadAttention, PositionwiseFeedForward
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, max_seq_length: int):
         super(PositionalEncoding, self).__init__()
-        
+
         print(max_seq_length, d_model)
         pe = torch.zeros(max_seq_length, d_model)
         position = torch.arange(0, max_seq_length, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model))
-        
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model)
+        )
+
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
-        
-        self.register_buffer('pe', pe.unsqueeze(0))
-        
+
+        self.register_buffer("pe", pe.unsqueeze(0))
+
     def forward(self, x):
-        return x + self.pe[:, :x.size(1)]
+        return x + self.pe[:, : x.size(1)]
+
 
 class EncoderLayer(nn.Module):
     def __init__(self, d_model, num_heads, d_ff, dropout):
@@ -98,7 +101,11 @@ class Transformer(nn.Module):
         src_mask = (src != 0).unsqueeze(1).unsqueeze(2)
         tgt_mask = (tgt != 0).unsqueeze(1).unsqueeze(3)
         seq_length = tgt.size(1)
-        nopeak_mask = (1 - torch.triu(torch.ones(1, seq_length, seq_length), diagonal=1)).bool().to(tgt.device)
+        nopeak_mask = (
+            (1 - torch.triu(torch.ones(1, seq_length, seq_length), diagonal=1))
+            .bool()
+            .to(tgt.device)
+        )
         tgt_mask = tgt_mask & nopeak_mask
         return src_mask, tgt_mask
 
