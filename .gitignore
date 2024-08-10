@@ -1,0 +1,18 @@
+# venv stuff
+venv/
+env/
+.venv/
+.env/
+
+# cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# vim 
+*.swp
+*.swo
+*~
+
+# vsc
+.vscode/
