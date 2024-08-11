@@ -15,7 +15,7 @@ def main():
     batch_size = 128
     num_epochs = 3
     learning_rate = 0.0001
-    max_length = 128
+    max_length = 64
     
     train_dataset = WMTDataset("train", max_length, subset_fraction=0.1)
     val_dataset = WMTDataset("validation", max_length)
