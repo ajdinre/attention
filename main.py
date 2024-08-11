@@ -13,10 +13,10 @@ def main():
     print(f'running on: {get_device()}')
     
     # hp
-    batch_size = 128
+    batch_size = 32
     num_epochs = 3
     learning_rate = 0.0001
-    max_length = 64
+    max_length = 32
     
     train_dataset = WMTDataset("train", max_length, subset_fraction=0.1)
     val_dataset = WMTDataset("validation", max_length)
