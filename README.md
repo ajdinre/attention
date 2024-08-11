@@ -12,5 +12,6 @@ Please note that the current implementation and hyperparameters are not optimize
 ## References
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 - [Transformer explainer](https://poloclub.github.io/transformer-explainer/)
+- [The Annotated Transformer](https://nlp.seas.harvard.edu/annotated-transformer/)
 - [WMT'16 multimodal translation task](http://www.statmt.org/wmt16/multimodal-task.html)
 - [llm visualization](https://bbycroft.net/llm), this is not an llm, but the transformer is nicely shown
