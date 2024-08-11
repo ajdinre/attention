@@ -13,7 +13,7 @@ def main():
     
     # hp
     batch_size = 256
-    num_epochs = 10
+    num_epochs = 3
     learning_rate = 0.0001
     max_length = 128
     
