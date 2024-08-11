@@ -12,10 +12,10 @@ def main():
     device = torch.device(get_device())
     
     # hp
-    batch_size = 64
+    batch_size = 256
     num_epochs = 10
     learning_rate = 0.0001
-    max_length = 16
+    max_length = 128
     
     train_dataset = WMTDataset("train", max_length, subset_fraction=0.1)
     val_dataset = WMTDataset("validation", max_length)
