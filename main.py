@@ -12,7 +12,7 @@ def main():
     device = torch.device(get_device())
     
     # hp
-    batch_size = 256
+    batch_size = 128
     num_epochs = 3
     learning_rate = 0.0001
     max_length = 128
