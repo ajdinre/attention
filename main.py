@@ -10,6 +10,7 @@ from utils import get_device
 
 def main():
     device = torch.device(get_device())
+    print(f'running on: {get_device()}')
     
     # hp
     batch_size = 128
