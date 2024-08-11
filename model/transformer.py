@@ -8,7 +8,6 @@ class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, max_seq_length: int):
         super(PositionalEncoding, self).__init__()
 
-        print(max_seq_length, d_model)
         pe = torch.zeros(max_seq_length, d_model)
         position = torch.arange(0, max_seq_length, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(
@@ -112,9 +111,12 @@ class Transformer(nn.Module):
     def forward(self, src, tgt):
         src_mask, tgt_mask = self.generate_mask(src, tgt)
 
+        # embedding matrix for source lang
         src_embedded = self.dropout(
             self.positional_encoding(self.encoder_embedding(src))
         )
+
+        # embedding matrix for target lang
         tgt_embedded = self.dropout(
             self.positional_encoding(self.decoder_embedding(tgt))
         )
