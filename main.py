@@ -50,7 +50,7 @@ def main():
         print(f"epoch {epoch+1}/{args.num_epochs}")
 
         timer.start()
-        train_model(model, train_loader, optimizer, device, accumulation_steps=4)
+        train_loss = train_model(model, train_loader, optimizer, device, accumulation_steps=4)
         epoch_time = timer.stop()
 
         val_loss = evaluate_model(model, val_loader, device)
