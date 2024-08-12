@@ -1,5 +1,7 @@
 # Attention Is All You Need
 
+NOTE: this is work in progress
+
 This repository features my implementation of the 'Attention Is All You Need' paper. The model is trained on the WMT German-English dataset and is aimed at neural machine translation. While this implementation is primarily for educational purposes, it serves as a hands-on way for me to learn the details of transformers and different attention mechanisms.
 
 ## Model Architecture
