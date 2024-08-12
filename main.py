@@ -53,9 +53,11 @@ def main():
         train_loss = train_model(model, train_loader, optimizer, device, accumulation_steps=4)
         epoch_time = timer.stop()
 
-        val_loss = evaluate_model(model, val_loader, device)
+        val_loss, val_accuracy, val_f1 = evaluate_model(model, val_loader, device)
         print(f"Train Loss: {train_loss:.4f}")
         print(f"Validation Loss: {val_loss:.4f}")
+        print(f"Validation Accuracy: {val_accuracy:.4f}")
+        print(f"Validation F1 Score: {val_f1:.4f}")
         print(f"Epoch time: {epoch_time:.2f} seconds")
     
     print("training completed")

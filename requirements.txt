@@ -7,3 +7,4 @@ tqdm
 torchviz
 graphviz
 torchinfo
+scikit-learn
