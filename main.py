@@ -1,48 +1,62 @@
 import torch
-from torch.utils.data import DataLoader
-from model.transformer import Transformer
+import argparse
 
+from torch.utils.data import DataLoader
+
+from model.transformer import Transformer
 from data.dataset import WMTDataset
 from train import train_model
 from evaluate import evaluate_model
+from utils import get_device, count_parameters, Timer, log_model_summary, visualize_model
 
-from utils import get_device
 
 def main():
+    parser = argparse.ArgumentParser(description="Transformer model training")
+    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
+    parser.add_argument("--num_epochs", type=int, default=3, help="Number of training epochs")
+    parser.add_argument("--learning_rate", type=float, default=0.0001, help="Learning rate")
+    parser.add_argument("--max_length", type=int, default=32, help="Maximum sequence length")
+    parser.add_argument("--subset_fraction", type=float, default=0.1, help="Fraction of training data to use")
+    args = parser.parse_args()
+
     device = torch.device(get_device())
     print(f'running on: {get_device()}')
     
-    # hp
-    batch_size = 32
-    num_epochs = 3
-    learning_rate = 0.0001
-    max_length = 32
+    train_dataset = WMTDataset("train", args.max_length, subset_fraction=args.subset_fraction)
+    val_dataset = WMTDataset("validation", args.max_length)
     
-    train_dataset = WMTDataset("train", max_length, subset_fraction=0.1)
-    val_dataset = WMTDataset("validation", max_length)
-    
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=args.batch_size)
     
     model = Transformer(
         src_vocab_size=train_dataset.tokenizer.vocab_size,
         tgt_vocab_size=train_dataset.tokenizer.vocab_size,
-        d_model=16,
+        d_model=8,
         nhead=2,
         num_encoder_layers=2,
         num_decoder_layers=2,
-        d_ff=128,
-        max_seq_length=max_length
+        d_ff=64,
+        max_seq_length=args.max_length
     ).to(device)
+
+    print(f"the model has {count_parameters(model):,} trainable parameters")
+    log_model_summary(model, input_size=(args.batch_size, args.max_length))
+    #visualize_model(model, input_size=(args.batch_size, args.max_length))
     
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
     
-    for epoch in range(num_epochs):
-        print(f"epoch {epoch+1}/{num_epochs}")
+    timer = Timer()
+    for epoch in range(args.num_epochs):
+        print(f"epoch {epoch+1}/{args.num_epochs}")
+
+        timer.start()
         train_model(model, train_loader, optimizer, device, accumulation_steps=4)
-        
+        epoch_time = timer.stop()
+
         val_loss = evaluate_model(model, val_loader, device)
-        print(f"validation Loss: {val_loss:.4f}")
+        print(f"Train Loss: {train_loss:.4f}")
+        print(f"Validation Loss: {val_loss:.4f}")
+        print(f"Epoch time: {epoch_time:.2f} seconds")
     
     print("training completed")
 
