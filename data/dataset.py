@@ -25,6 +25,7 @@ class WMTDataset(Dataset):
             "bert-base-multilingual-cased",
             model_max_length=max_length,
             vocab_size=vocab_size,
+            clean_up_tokenization_spaces=True,
         )
 
     def __len__(self) -> int:
