@@ -4,3 +4,6 @@ torchaudio
 datasets
 transformers
 tqdm
+torchviz
+graphviz
+torchinfo
