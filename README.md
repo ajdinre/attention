@@ -23,3 +23,4 @@ Please note that the current implementation and hyperparameters are not optimize
 - [WMT'16 multimodal translation task](http://www.statmt.org/wmt16/multimodal-task.html)
 - [llm visualization](https://bbycroft.net/llm), this is not an llm, but the transformer is nicely shown
 - [Transformer with PyTorch](https://www.datacamp.com/tutorial/building-a-transformer-with-py-torch?dc_referrer=https%3A%2F%2Fwww.google.com%2F)
+- [How Many Layers and Why? An Analysis of the Model Depth in Transformers](https://aclanthology.org/2021.acl-srw.23.pdf)
