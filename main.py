@@ -30,10 +30,13 @@ def main():
     
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size)
+
+    print('vocab size')
+    print(args.vocab_size, train_dataset.tokenizer.vocab_size)
     
     model = Transformer(
-        src_vocab_size=min(args.vocab_size, train_dataset.tokenizer.vocab_size),
-        tgt_vocab_size=min(args.vocab_size, train_dataset.tokenizer.vocab_size),
+        src_vocab_size=train_dataset.tokenizer.vocab_size,
+        tgt_vocab_size=train_dataset.tokenizer.vocab_size,
         d_model=8,
         nhead=2,
         num_encoder_layers=args.num_encoder_layers,
