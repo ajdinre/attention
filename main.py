@@ -17,6 +17,8 @@ def main():
     parser.add_argument("--learning_rate", type=float, default=0.0001, help="Learning rate")
     parser.add_argument("--max_length", type=int, default=32, help="Maximum sequence length")
     parser.add_argument("--subset_fraction", type=float, default=0.1, help="Fraction of training data to use")
+    parser.add_argument("--num_encoder_layers", type=int, default=2, help="Number of encoder layers")
+    parser.add_argument("--num_decoder_layers", type=int, default=2, help="Number of decoder layers")
     args = parser.parse_args()
 
     device = torch.device(get_device())
@@ -33,8 +35,8 @@ def main():
         tgt_vocab_size=train_dataset.tokenizer.vocab_size,
         d_model=8,
         nhead=2,
-        num_encoder_layers=2,
-        num_decoder_layers=2,
+        num_encoder_layers=args.num_encoder_layers,
+        num_decoder_layers=args.num_decoder_layers,
         d_ff=64,
         max_seq_length=args.max_length
     ).to(device)
