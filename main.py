@@ -19,20 +19,21 @@ def main():
     parser.add_argument("--subset_fraction", type=float, default=0.1, help="Fraction of training data to use")
     parser.add_argument("--num_encoder_layers", type=int, default=2, help="Number of encoder layers")
     parser.add_argument("--num_decoder_layers", type=int, default=2, help="Number of decoder layers")
+    parser.add_argument("--vocab_size", type=int, default=30000, help="Vocabulary size")
     args = parser.parse_args()
 
     device = torch.device(get_device())
     print(f'running on: {get_device()}')
     
-    train_dataset = WMTDataset("train", args.max_length, subset_fraction=args.subset_fraction)
-    val_dataset = WMTDataset("validation", args.max_length)
+    train_dataset = WMTDataset("train", args.max_length, subset_fraction=args.subset_fraction, vocab_size=args.vocab_size)
+    val_dataset = WMTDataset("validation", args.max_length, vocab_size=args.vocab_size)
     
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size)
     
     model = Transformer(
-        src_vocab_size=train_dataset.tokenizer.vocab_size,
-        tgt_vocab_size=train_dataset.tokenizer.vocab_size,
+        src_vocab_size=min(args.vocab_size, train_dataset.tokenizer.vocab_size),
+        tgt_vocab_size=min(args.vocab_size, train_dataset.tokenizer.vocab_size),
         d_model=8,
         nhead=2,
         num_encoder_layers=args.num_encoder_layers,
@@ -41,7 +42,10 @@ def main():
         max_seq_length=args.max_length
     ).to(device)
 
-    print(f"the model has {count_parameters(model):,} trainable parameters")
+    print(f"Vocabulary size: {min(args.vocab_size, train_dataset.tokenizer.vocab_size)}")
+    print(f"Number of encoder layers: {args.num_encoder_layers}")
+    print(f"Number of decoder layers: {args.num_decoder_layers}")
+    print(f"The model has {count_parameters(model):,} trainable parameters")
     log_model_summary(model, input_size=(args.batch_size, args.max_length))
     #visualize_model(model, input_size=(args.batch_size, args.max_length))
     
