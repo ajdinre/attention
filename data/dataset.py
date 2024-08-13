@@ -10,7 +10,7 @@ class WMTDataset(Dataset):
         split: str = "train",
         max_length: int = 512,
         subset_fraction: float = 1.0,
-        vocab_size: int = 10000,
+        vocab_size: int = 30000,
     ):
         self.dataset = load_dataset("wmt/wmt14", "de-en", split=split)
 
